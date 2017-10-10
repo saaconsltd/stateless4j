@@ -114,24 +114,166 @@ public class StateConfiguration<S, T> {
      * Applies to the current state only. No exit or entry actions will be
      * executed and the state will not change. The only thing that happens is
      * the execution of a given action.
-     * <p>
-     * The action is only executed if the given guard returns true. Otherwise
-     * this transition will not be taken into account (so it does not count
-     * as 'ignore', then).
      *
-     * @param trigger The accepted trigger
-     * @param guard   Function that must return true in order for the trigger to be accepted
-     * @param action  The action to be performed
-     * @return The reciever
+     * @param trigger                  The accepted trigger
+     * @param action                   The action to be performed "during" transition
+     * @param <TArg0>                  Type of the first trigger argument
+     * @return The receiver
      */
-    public StateConfiguration<S, T> permitInternalIf(T trigger, FuncBoolean guard, Action action) {
-        assert guard != null : "guard is null";
-        assert action != null : "action is null";
-        representation.addTriggerBehaviour(new InternalTriggerBehaviour<S, T>(
-              trigger, guard, action));
-        return this;
+    public <TArg0> StateConfiguration<S, T> permitInternal(TriggerWithParameters1<TArg0, S, T> trigger,
+            Action1<TArg0> action) {
+        return permitInternalIf(trigger, NO_GUARD, action);
+    }
+        
+    /**
+     * Accept the specified trigger, execute action and stay in state
+     *
+     * Applies to the current state only. No exit or entry actions will be
+     * executed and the state will not change. The only thing that happens is
+     * the execution of a given action.
+     *
+     * @param trigger                  The accepted trigger
+     * @param action                   The action to be performed "during" transition
+     * @param <TArg0>                  Type of the first trigger argument
+     * @param <TArg1>                  Type of the second trigger argument
+     * @return The receiver
+     */
+    public <TArg0, TArg1> StateConfiguration<S, T> permitInternal(
+            TriggerWithParameters2<TArg0, TArg1, S, T> trigger,
+            Action2<TArg0, TArg1> action) {
+        return permitInternalIf(trigger, NO_GUARD, action);
     }
 
+    /**
+     * Accept the specified trigger, execute action and stay in state
+     *
+     * Applies to the current state only. No exit or entry actions will be
+     * executed and the state will not change. The only thing that happens is
+     * the execution of a given action.
+     *
+     * @param trigger                  The accepted trigger
+     * @param action                   The action to be performed "during" transition
+     * @param <TArg0>                  Type of the first trigger argument
+     * @param <TArg1>                  Type of the second trigger argument
+     * @param <TArg2>                  Type of the third trigger argument
+     * @return The receiver
+     */
+    public <TArg0, TArg1, TArg2> StateConfiguration<S, T> permitInternal(TriggerWithParameters3<TArg0, TArg1, TArg2, S, T> trigger,
+            final Action3<TArg0, TArg1, TArg2> action) {
+        return permitInternalIf(trigger, NO_GUARD, action);
+    }
+    
+    /**
+     * Accept the specified trigger, execute action and stay in state
+     *
+     * Applies to the current state only. No exit or entry actions will be
+     * executed and the state will not change. The only thing that happens is
+     * the execution of a given action.
+     *
+     * @param trigger                  The accepted trigger
+     * @param guard                    Function that must return true in order for the  trigger to be accepted
+     * @param action                   The action to be performed "during" transition
+     * @return The receiver
+     */
+    public StateConfiguration<S, T> permitInternalIf(T trigger, FuncBoolean guard,
+            final Action action) {
+        return publicPermitInternalIf(trigger, guard, new Action1<Object[]>() {
+            @Override
+            public void doIt(Object[] args) {
+                action.doIt();
+            }
+        });
+    }
+
+    /**
+     * Accept the specified trigger, execute action and stay in state
+     *
+     * Applies to the current state only. No exit or entry actions will be
+     * executed and the state will not change. The only thing that happens is
+     * the execution of a given action.
+     *
+     * @param trigger                  The accepted trigger
+     * @param guard                    Function that must return true in order for the  trigger to be accepted
+     * @param action                   The action to be performed "during" transition
+     * @param <TArg0>                  Type of the first trigger argument
+     * @return The receiver
+     */
+    public <TArg0> StateConfiguration<S, T> permitInternalIf(TriggerWithParameters1<TArg0, S, T> trigger, FuncBoolean guard,
+            final Action1<TArg0> action) {
+        assert trigger != null : "trigger is null";
+        return publicPermitInternalIf(
+                trigger.getTrigger(), guard, new Action1<Object[]>() {
+                    @SuppressWarnings("unchecked")
+                    @Override
+                    public void doIt(Object[] args) {
+                        action.doIt((TArg0) args[0]);
+                    }
+                }
+        );
+    }
+
+    /**
+     * Accept the specified trigger, execute action and stay in state
+     *
+     * Applies to the current state only. No exit or entry actions will be
+     * executed and the state will not change. The only thing that happens is
+     * the execution of a given action.
+     *
+     * @param trigger                  The accepted trigger
+     * @param guard                    Function that must return true in order for the  trigger to be accepted
+     * @param action                   The action to be performed "during" transition
+     * @param <TArg0>                  Type of the first trigger argument
+     * @param <TArg1>                  Type of the second trigger argument
+     * @return The receiver
+     */
+    public <TArg0, TArg1> StateConfiguration<S, T> permitInternalIf(TriggerWithParameters2<TArg0, TArg1, S, T> trigger, FuncBoolean guard,
+            final Action2<TArg0, TArg1> action) {
+        assert trigger != null : "trigger is null";
+        return publicPermitInternalIf(
+                trigger.getTrigger(), guard, new Action1<Object[]>() {
+                    @SuppressWarnings("unchecked")
+                    @Override
+                    public void doIt(Object[] args) {
+                        action.doIt(
+                                (TArg0) args[0],
+                                (TArg1) args[1]);
+                    }
+                }
+        );
+    }
+
+    /**
+     * Accept the specified trigger, execute action and stay in state
+     *
+     * Applies to the current state only. No exit or entry actions will be
+     * executed and the state will not change. The only thing that happens is
+     * the execution of a given action.
+     *
+     * @param trigger                  The accepted trigger
+     * @param guard                    Function that must return true in order for the  trigger to be accepted
+     * @param action                   The action to be performed "during" transition
+     * @param <TArg0>                  Type of the first trigger argument
+     * @param <TArg1>                  Type of the second trigger argument
+     * @param <TArg2>                  Type of the third trigger argument
+     * @return The receiver
+     */
+    public <TArg0, TArg1, TArg2> StateConfiguration<S, T> permitInternalIf(TriggerWithParameters3<TArg0, TArg1, TArg2, S, T> trigger,
+            FuncBoolean guard, final Action3<TArg0, TArg1, TArg2> action) {
+        assert trigger != null : "trigger is null";
+        return publicPermitInternalIf(
+                trigger.getTrigger(), guard, new Action1<Object[]>() {
+                    @SuppressWarnings("unchecked")
+                    @Override
+                    public void doIt(Object[] args) {
+                        action.doIt(
+                                (TArg0) args[0],
+                                (TArg1) args[1],
+                                (TArg2) args[2]);
+                    }
+                }
+        );
+    }
+    
     /**
      * Accept the specified trigger, execute exit actions and re-execute entry actions. Reentry behaves as though the
      * configured state transitions to an identical sibling state
@@ -216,7 +358,7 @@ public class StateConfiguration<S, T> {
      */
     public StateConfiguration<S, T> ignoreIf(T trigger, FuncBoolean guard) {
         assert guard != null : "guard is null";
-        representation.addTriggerBehaviour(new InternalTriggerBehaviour<S, T>(trigger, guard, NO_ACTION));
+        representation.addTriggerBehaviour(new InternalTriggerBehaviour<S, T>(trigger, guard, NO_ACTION_N));
         return this;
     }
 
@@ -907,6 +1049,12 @@ public class StateConfiguration<S, T> {
         assert destinationStateSelector != null : "destinationStateSelector is null";
         assert guard != null : "guard is null";
         representation.addTriggerBehaviour(new DynamicTriggerBehaviour<>(trigger, destinationStateSelector, guard, action));
+        return this;
+    }
+
+    StateConfiguration<S, T> publicPermitInternalIf(T trigger, FuncBoolean guard, Action1<Object[]> action) {
+        assert guard != null : "guard is null";
+        representation.addTriggerBehaviour(new InternalTriggerBehaviour<S, T>(trigger, guard, action));
         return this;
     }
 }
